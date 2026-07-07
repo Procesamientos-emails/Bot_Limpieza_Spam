@@ -1,0 +1,50 @@
+name: Limpieza de Spam
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  limpiar-spam:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: pip install requests
+
+      - name: Crear config.json con los Secrets
+        run: |
+          cat > config.json << 'EOF'
+          {
+            "accounts": [
+              {
+                "provider": "gmail",
+                "email": "${{ secrets.GMAIL_EMAIL }}",
+                "password": "${{ secrets.GMAIL_PASSWORD }}",
+                "imap_server": "imap.gmail.com",
+                "imap_port": 993,
+                "default_folder": "[Gmail]/Spam"
+              },
+              {
+                "provider": "hotmail",
+                "email": "${{ secrets.HOTMAIL_EMAIL }}",
+                "client_id": "${{ secrets.HOTMAIL_CLIENT_ID }}",
+                "refresh_token": "${{ secrets.HOTMAIL_REFRESH_TOKEN }}",
+                "imap_server": "outlook.office365.com",
+                "imap_port": 993,
+                "default_folder": "Junk"
+              }
+            ]
+          }
+          EOF
+
+      - name: Ejecutar el bot de limpieza
+        run: python filter_bot.py
