@@ -2,7 +2,8 @@ name: Limpieza de Spam
 
 on:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '15 5,17 * * *'
+
   workflow_dispatch:
 
 jobs:
